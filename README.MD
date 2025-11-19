@@ -61,6 +61,20 @@ The MySQL connection in `index.js` reads these using process.env so no credentia
 
 My `.env` file is included in `.gitignore` so it stays private.
 
+## Audit logging
+
+I implemented a simple audit log to record all login attempts.
+
+I created an `audit_log` table with the columns:
+`username`, `success` (boolean), and `timestamp`.
+
+In `routes/users.js` I added a `logAttempt(username, success)` helper that
+inserts a row into `audit_log` every time a user tries to log in. It logs
+successful logins as well as failed attempts (wrong password or unknown user).
+
+There is also a `/users/audit` route and `audit.ejs` view which display the
+full login history in a table for debugging and security monitoring.
+
 ## How to run it
 
 1. Install dependencies
