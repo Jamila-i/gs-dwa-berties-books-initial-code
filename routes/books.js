@@ -26,8 +26,9 @@ router.get("/search", function (req, res, next) {
    --------------------------------------------------------- */
 
 router.get("/search-result", function (req, res, next) {
-  // Get the search keyword from the query string
-  const keyword = req.query.keyword;
+  // Get and sanitise the search keyword from the query string
+  const rawKeyword = req.query.keyword || "";
+  const keyword = req.sanitize(rawKeyword);
 
   // Advanced search: find titles that contain the keyword anywhere
   let sqlquery = "SELECT * FROM books WHERE name LIKE ?";
@@ -63,12 +64,23 @@ router.get("/addbook", redirectLogin, function (req, res, next) {
 router.post(
   "/bookadded",
   redirectLogin,
+
+  // sanitise book fields
+  (req, res, next) => {
+    req.body.name = req.sanitize(req.body.name);
+    req.body.price = req.sanitize(req.body.price);
+    next();
+  },
+
+  // validate
   [
     check("name").notEmpty().withMessage("Book name is required"),
     check("price")
       .isFloat({ min: 0 })
       .withMessage("Price must be a positive number"),
   ],
+
+  // handler
   function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -81,10 +93,9 @@ router.post(
     // saving data in database
     let sqlquery = "INSERT INTO books (name, price) VALUES (?, ?)";
 
-    // data from the form
+    // data from the (sanitised) form
     let newrecord = [req.body.name, req.body.price];
 
-    // Execute SQL query
     db.query(sqlquery, newrecord, (err, result) => {
       if (err) {
         return next(err);
