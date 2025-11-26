@@ -157,18 +157,6 @@ These fields come directly from users and some of them are shown back in the reg
 
 ---
 
-#### Login Form (`users.js`)\*\*
-
-Sanitised fields:
-
-- `username`
-- `password`
-
-**Reason:**  
-Although these fields are not displayed back to the browser, sanitising them ensures no malicious input is processed or logged. It is best practice to sanitise all user-controlled fields.
-
----
-
 #### Add Book Form (`books.js`)\*\*
 
 Sanitised fields:

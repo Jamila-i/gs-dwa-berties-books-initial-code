@@ -35,7 +35,6 @@ router.post(
     req.body.last = req.sanitize(req.body.last);
     req.body.username = req.sanitize(req.body.username);
     req.body.email = req.sanitize(req.body.email);
-    req.body.password = req.sanitize(req.body.password);
     next();
   },
 
@@ -92,9 +91,8 @@ router.post(
 
 // Handle login form submission
 router.post("/loggedin", function (req, res, next) {
-  // sanitise login fields
-  const username = req.sanitize(req.body.username);
-  const password = req.sanitize(req.body.password);
+  const username = req.body.username;
+  const password = req.body.password;
 
   const sqlquery = "SELECT * FROM users WHERE username = ?";
 
