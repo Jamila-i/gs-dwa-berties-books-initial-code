@@ -132,6 +132,101 @@ Only valid book data should enter the database. A missing title or invalid price
 
 ---
 
+## Sanitisation Overview
+
+This project uses `express-sanitizer` to protect input fields from Cross-Site Scripting (XSS) attacks. Sanitisation ensures that any user-submitted HTML or JavaScript is safely removed before the data is validated, stored in the database, or displayed back to the user.
+
+Below is an explanation of where sanitisation was applied, where it was not applied, and the reasoning behind these decisions.
+
+---
+
+### Where Sanitisation **Was Applied**
+
+#### Registration Form (`users.js`)\*\*
+
+Sanitised fields:
+
+- `username`
+- `first`
+- `last`
+- `email`
+- `password`
+
+**Reason:**  
+These fields come directly from users and some of them are shown back in the registration confirmation message. Without sanitisation, an attacker could enter code such as `<script>alert('XSS')</script>` which would execute in the browser. Sanitising these inputs removes any potentially malicious tags before validation and database storage.
+
+---
+
+#### Login Form (`users.js`)\*\*
+
+Sanitised fields:
+
+- `username`
+- `password`
+
+**Reason:**  
+Although these fields are not displayed back to the browser, sanitising them ensures no malicious input is processed or logged. It is best practice to sanitise all user-controlled fields.
+
+---
+
+#### Add Book Form (`books.js`)\*\*
+
+Sanitised fields:
+
+- `name`
+- `price`
+
+**Reason:**  
+Both values are displayed on the confirmation page and in the book list. Without sanitisation, a user could inject harmful scripts that would run when other users view the page. Sanitisation prevents XSS attacks by removing unsafe HTML/JS.
+
+---
+
+#### Search Keyword (`books.js`)\*\*
+
+Sanitised field:
+
+- `keyword` (GET query parameter)
+
+**Reason:**  
+The search keyword is displayed on the results page. This prevents reflective XSS attacks such as:  
+`/books/search-result?keyword=<script>alert('x')</script>`.
+
+---
+
+### Where Sanitisation **Was Not Applied**
+
+#### Static Pages (`index.ejs`, `about.ejs`)\*\*
+
+These pages contain no user input.
+
+**Reason:**  
+No dynamic or user-submitted content is processed, so there is nothing to sanitise.
+
+---
+
+#### Database-generated numeric fields\*\*
+
+Such as:
+
+- `id`
+- numeric `price` values retrieved from the database
+
+**Reason:**  
+These values are not user-editable text and cannot contain scripts, so sanitising them is unnecessary.
+
+---
+
+#### Logout Route\*\*
+
+The logout endpoint only destroys the session and does not process user input.
+
+**Reason:**  
+No sanitisation needed because no user data is submitted.
+
+---
+
+This approach provides strong protection against XSS while keeping the application efficient and secure.
+
 ## How to run it
 
 1. Install dependencies
