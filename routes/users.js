@@ -51,7 +51,7 @@ router.post(
     console.log("Validation errors:", errors.array());
 
     if (!errors.isEmpty()) {
-      return res.redirect("/users/register");
+      return res.redirect("../users/register");
     }
 
     const first = req.body.first;
