@@ -118,7 +118,7 @@ router.post(
    --------------------------------------------------------- */
 
 // display a list of all books in the database
-router.get("/list", redirectLogin, function (req, res, next) {
+router.get("/list", function (req, res, next) {
   let sqlquery = "SELECT * FROM books"; // Retrieve all book records
 
   db.query(sqlquery, (err, result) => {
